@@ -7,6 +7,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     libgl1 \
     libglib2.0-0 \
+    libsm6 \
+    libxext6 \
     libpq-dev \
     gcc \
     && rm -rf /var/lib/apt/lists/*
@@ -22,5 +24,5 @@ RUN mkdir -p uploads && chmod 777 uploads
 # Expose the port FastAPI runs on
 EXPOSE 8000
 
-# Start server with gunicorn for production stability
-CMD ["gunicorn", "app.main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--timeout", "120"]
+# Start server with gunicorn for production stability (Reduced workers for Free Tier)
+CMD ["gunicorn", "app.main:app", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--timeout", "120"]
