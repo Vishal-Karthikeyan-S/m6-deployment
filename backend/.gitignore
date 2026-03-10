@@ -1,0 +1,31 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Project Specific
+crop_diagnosis.db
+dataset/
+uploads/
+mapping_results.txt
+
+# OS
+.DS_Store
+
+# Temporary Scripts (Diagnostic)
+check_labels.py
+check_model_size.py
+diag_top5.py
+discover_indices.py
+fast_tune.py
+final_mapper.py
+final_mapper_top5.py
+test_mapping.py
+train_model.py
+seed_remediation.py

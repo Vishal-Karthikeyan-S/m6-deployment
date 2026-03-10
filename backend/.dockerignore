@@ -1,0 +1,11 @@
+
+venv/
+.git/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+crop_diagnosis.db
+uploads/
+*.pth
+!app/model/plant_model.pth
