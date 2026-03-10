@@ -21,16 +21,21 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.9' # Matches the doctor output
+          flutter-version: '3.38.9'
           channel: 'stable'
           cache: true
+
+      - name: Fix gradlew permissions
+        run: |
+          chmod +x android/gradlew
+        working-directory: frontend
 
       - name: Get Dependencies
         run: flutter pub get
         working-directory: frontend
 
       - name: Build APK
-        run: flutter build apk --release --dart-define=BACKEND_URL=${{ secrets.BACKEND_URL }}
+        run: flutter build apk --release --verbose --dart-define=BACKEND_URL=${{ secrets.BACKEND_URL }}
         working-directory: frontend
 
       - name: Upload APK
