@@ -1,0 +1,17 @@
+
+services:
+  - type: web
+    name: m6-backend
+    runtime: docker
+    rootDir: backend
+    envVars:
+      - key: DATABASE_URL
+        allowOverride: true
+      - key: SUPABASE_URL
+        allowOverride: true
+      - key: SUPABASE_KEY
+        allowOverride: true
+      - key: SUPABASE_BUCKET
+        default: crop-images
+      - key: PORT
+        default: 8000
