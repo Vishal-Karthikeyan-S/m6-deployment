@@ -35,7 +35,7 @@ jobs:
           export PYTHONPATH=$PYTHONPATH:.
           pytest tests/integration_test.py -v --disable-warnings
         env:
-          DATABASE_URL: sqlite:///:memory: # Use in-memory for CI tests
+          DATABASE_URL: "sqlite:///:memory:"
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
