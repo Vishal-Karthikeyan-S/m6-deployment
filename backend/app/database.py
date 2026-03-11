@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, StaticPool
 from sqlalchemy.orm import sessionmaker
 
 import os
@@ -15,7 +15,17 @@ if DATABASE_URL:
         engine = create_engine(DATABASE_URL)
     else:
         print(f"USING DATABASE: {DATABASE_URL}")
-        engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
+        # Use StaticPool for in-memory SQLite to persist data across multiple connections/sessions
+        engine_args = {}
+        if DATABASE_URL == "sqlite:///:memory:":
+            engine_args = {
+                "connect_args": {"check_same_thread": False},
+                "poolclass": StaticPool
+            }
+        elif "sqlite" in DATABASE_URL:
+            engine_args = {"connect_args": {"check_same_thread": False}}
+            
+        engine = create_engine(DATABASE_URL, **engine_args)
 else:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     DATABASE_PATH = os.path.join(BASE_DIR, "crop_diagnosis.db")
