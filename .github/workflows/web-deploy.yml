@@ -32,8 +32,16 @@ jobs:
         working-directory: frontend
 
       - name: Build Web
-        run: flutter build web --release --dart-define=BACKEND_URL=${{ secrets.BACKEND_URL }}
+        run: flutter build web --release --verbose --dart-define=BACKEND_URL=${{ secrets.BACKEND_URL }}
         working-directory: frontend
+
+      - name: Check Build Output
+        run: |
+          ls -R frontend/build/web
+          if [ ! -f "frontend/build/web/index.html" ]; then
+            echo "Error: index.html not found!"
+            exit 1
+          fi
 
       - name: Commit Web Release to Main
         run: |
@@ -43,5 +51,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add web-release/
+          git fetch origin main
+          git pull origin main --rebase
           git commit -m "chore: update web-release artifacts [skip ci]" || echo "No changes to commit"
           git push origin main
