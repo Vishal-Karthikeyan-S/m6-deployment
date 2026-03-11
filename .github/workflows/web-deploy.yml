@@ -7,6 +7,10 @@ on:
       - main
     paths:
       - 'frontend/**'
+      - '.github/workflows/web-deploy.yml'
+
+permissions:
+  contents: write
 
 jobs:
   build:
