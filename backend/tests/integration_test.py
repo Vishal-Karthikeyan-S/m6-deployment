@@ -1,7 +1,25 @@
-import pytest
-from fastapi.testclient import TestClient
-from app.main import app
+from app.database import engine, SessionLocal
+from app.models.base import Base
+from app.models.remediation import Remediation, TreatmentStep
+from app.models.media import Media
 import uuid
+
+# ✅ Create tables for testing (Crucial for in-memory SQLite used in CI)
+Base.metadata.create_all(bind=engine)
+
+# ✅ Seed dummy test data so the integration tests have something to find
+db = SessionLocal()
+try:
+    if not db.query(Remediation).filter(Remediation.disease_id == "Potato Early Blight").first():
+        test_rem = Remediation(
+            disease_id="Potato Early Blight",
+            disease_name="Potato Early Blight",
+            general_advice="Test advice: keep leaves dry."
+        )
+        db.add(test_rem)
+        db.commit()
+finally:
+    db.close()
 
 client = TestClient(app)
 
