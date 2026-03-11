@@ -83,7 +83,6 @@ class DiagnosisResult {
   factory DiagnosisResult.fromJson(Map<String, dynamic> json) {
     // Parse from backend API response
     final confidence = (json['confidence'] ?? 0.0).toDouble();
-    final isUnknown = confidence < 0.40; // Threshold for unknown (Lowered from 0.70 to 0.40)
 
     final diseaseName = json['disease_name'] ?? 'Unknown';
     
