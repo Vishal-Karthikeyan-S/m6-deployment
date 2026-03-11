@@ -8274,7 +8274,7 @@ q=A.b0q(a.h(0,"severity"))
 p=a.h(0,"disease_icon")
 o=a.h(0,"description")
 n=a.h(0,m)!=null?A.uY(a.h(0,m)):new A.dj(Date.now(),0,!1)
-return new A.nJ(l,s,r,q,k,p,o,n,k<0.7)},
+return new A.nJ(l,s,r,q,k,p,o,n,k<0.4)},
 b0q(a){if(typeof a=="string")return B.b.my(B.xu,new A.ad4(a),new A.ad5())
 return B.iC},
 jL:function jL(a,b){this.a=a
