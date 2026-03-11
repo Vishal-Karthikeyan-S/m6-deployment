@@ -13,3 +13,5 @@ pillow
 opencv-python
 numpy
 supabase
+pytest
+httpx

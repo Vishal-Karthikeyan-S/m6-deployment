@@ -1,0 +1,99 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/ci-cd.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          
+      - name: Install dependencies
+        run: |
+          pip install -r backend/requirements.txt
+          
+      - name: Run Backend Integration Tests
+        run: |
+          cd backend
+          export PYTHONPATH=$PYTHONPATH:.
+          pytest tests/integration_test.py -v --disable-warnings
+        env:
+          DATABASE_URL: sqlite:///:memory: # Use in-memory for CI tests
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.9'
+          channel: 'stable'
+          cache: true
+          
+      - name: Get Dependencies
+        run: |
+          cd frontend
+          flutter pub get
+          
+      - name: Run Frontend Tests (Unit/Widget)
+        run: |
+          cd frontend
+          flutter test --reporter expanded
+
+  deploy-web:
+    needs: [backend-tests, frontend-tests]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.9'
+          channel: 'stable'
+          cache: true
+
+      - name: Get Dependencies
+        run: |
+          cd frontend
+          flutter pub get
+
+      - name: Build Web Release
+        run: |
+          cd frontend
+          flutter build web --release --dart-define=BACKEND_URL=${{ secrets.BACKEND_URL }}
+
+      - name: Commit and Push Web Release
+        run: |
+          mkdir -p web-release
+          rm -rf web-release/*
+          cp -r frontend/build/web/* web-release/
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add web-release/
+          git fetch origin main
+          git pull origin main --rebase
+          git commit -m "chore: automated web release after tests pass [skip ci]" || echo "No changes to commit"
+          git push origin main
