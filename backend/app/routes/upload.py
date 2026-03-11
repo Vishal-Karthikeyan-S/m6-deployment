@@ -34,30 +34,50 @@ def get_db():
 def run_ml_in_background(media_id: str, file_path: str):
     """Run ML prediction in a background thread and update DB with results."""
     from app.services.predict import predict_disease, predict_video
-    db = SessionLocal()
-    try:
-        if file_path.lower().endswith((".mp4", ".avi")):
-            result = predict_video(file_path)
-        else:
-            result = predict_disease(file_path)
+    import time
+    
+    attempts = 0
+    max_retries = 3
+    
+    while attempts < max_retries:
+        db = SessionLocal()
+        try:
+            attempts += 1
+            if file_path.lower().endswith((".mp4", ".avi")):
+                result = predict_video(file_path)
+            else:
+                result = predict_disease(file_path)
 
-        print("Prediction result:", result)
+            print(f"Prediction result for {media_id} (Attempt {attempts}):", result)
 
-        media = db.query(Media).filter(Media.media_id == media_id).first()
-        if media:
-            media.status = "COMPLETED"
-            media.result = result["disease"]
-            media.confidence = result["confidence"]
-            media.severity = result["severity"]
-            db.commit()
-    except Exception as e:
-        print("ML Task Error:", str(e))
-        media = db.query(Media).filter(Media.media_id == media_id).first()
-        if media:
-            media.status = "FAILED"
-            db.commit()
-    finally:
-        db.close()
+            media = db.query(Media).filter(Media.media_id == media_id).first()
+            if media:
+                media.status = "COMPLETED"
+                media.result = result["disease"]
+                media.confidence = result["confidence"]
+                media.severity = result["severity"]
+                db.commit()
+                print(f"Successfully updated DB for {media_id}")
+                break # Success!
+            else:
+                print(f"Media {media_id} not found in DB during update attempt {attempts}")
+                
+        except Exception as e:
+            print(f"ML Task Error (Attempt {attempts}/{max_retries}) for {media_id}:", str(e))
+            db.rollback()
+            if attempts >= max_retries:
+                # Final attempt failed
+                try:
+                    media = db.query(Media).filter(Media.media_id == media_id).first()
+                    if media:
+                        media.status = "FAILED"
+                        db.commit()
+                except:
+                    pass
+            else:
+                time.sleep(1) # Wait before retry
+        finally:
+            db.close()
 
 
 # ✅ Secure Upload API
