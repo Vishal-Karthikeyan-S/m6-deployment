@@ -32,7 +32,10 @@ void main() async {
   // Professional Dynamic Backend Discovery: 
   // Use the same host as the page (localhost, 127.0.0.1, or a specific IP)
   // Support production URL via --dart-define=BACKEND_URL=https://your-app.onrender.com
-  const String prodUrl = String.fromEnvironment('BACKEND_URL');
+  String prodUrl = const String.fromEnvironment('BACKEND_URL');
+  if (prodUrl.endsWith('/')) {
+    prodUrl = prodUrl.substring(0, prodUrl.length - 1);
+  }
   
   String host = kIsWeb ? Uri.base.host : '10.0.2.2';
   if (host == '0.0.0.0' || host.isEmpty) host = 'localhost';
