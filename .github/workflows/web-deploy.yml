@@ -8,8 +8,6 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/web-deploy.yml'
-    paths-ignore:
-      - 'web-release/**'
 
 permissions:
   contents: write
