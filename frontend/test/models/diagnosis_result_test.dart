@@ -222,13 +222,13 @@ void main() {
         expect(result.isUnknown, false);
       });
 
-      test('should set isUnknown to true when confidence is below 0.4', () {
+      test('should set isUnknown to true when disease name is unknown and confidence is below 0.4', () {
         final json = {
           'id': 'diag123',
           'submission_id': 'sub456',
           'disease_name': 'Unknown',
           'severity': 'unknown',
-          'confidence': 0.3, // Below 0.4
+          'confidence': 0.3,
         };
 
         final result = DiagnosisResult.fromJson(json);

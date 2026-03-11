@@ -85,10 +85,18 @@ class DiagnosisResult {
     final confidence = (json['confidence'] ?? 0.0).toDouble();
     final isUnknown = confidence < 0.40; // Threshold for unknown (Lowered from 0.70 to 0.40)
 
+    final diseaseName = json['disease_name'] ?? 'Unknown';
+    
+    // Explicitly check if the backend provided a meaningful result
+    final bool hasValidResult = diseaseName != 'Unknown' && diseaseName != 'Unknown Condition';
+    
+    // Set isUnknown to true only if confidence is very low AND backend didn't give a specific name
+    final bool isUnknown = hasValidResult ? false : (confidence < 0.40);
+
     return DiagnosisResult(
       id: json['id'] ?? '',
       submissionId: json['submission_id'] ?? '',
-      diseaseName: json['disease_name'] ?? 'Unknown',
+      diseaseName: diseaseName,
       severity: _parseSeverity(json['severity']),
       confidence: confidence,
       diseaseIcon: json['disease_icon'],
