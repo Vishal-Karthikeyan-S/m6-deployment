@@ -27,6 +27,11 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Debug Directory Structure
+        run: |
+          ls -R
+          pwd
+
       - name: Get Dependencies
         run: flutter pub get
         working-directory: frontend
