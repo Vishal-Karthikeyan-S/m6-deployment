@@ -1,0 +1,38 @@
+name: Build and Deploy Flutter Web
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.9'
+          channel: 'stable'
+          cache: true
+
+      - name: Get Dependencies
+        run: flutter pub get
+        working-directory: frontend
+
+      - name: Build Web
+        run: flutter build web --release --dart-define=BACKEND_URL=${{ secrets.BACKEND_URL }}
+        working-directory: frontend
+
+      - name: Deploy to Web Branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/build/web
+          publish_branch: web-live
+          force_orphan: true
