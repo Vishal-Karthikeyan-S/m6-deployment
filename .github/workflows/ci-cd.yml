@@ -92,13 +92,13 @@ jobs:
 
       - name: Commit and Push Web Release
         run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git rebase origin/main
           mkdir -p web-release
           rm -rf web-release/*
           cp -r frontend/build/web/* web-release/
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add web-release/
-          git fetch origin main
-          git pull origin main --rebase
           git commit -m "chore: automated web release after tests pass [skip ci]" || echo "No changes to commit"
           git push origin main
