@@ -7,12 +7,15 @@ import os
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
-    # Handle Render/Supabase connection strings that might use postgres:// instead of postgresql://
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
     
-    print("USING POSTGRES DATABASE")
-    engine = create_engine(DATABASE_URL)
+    if "postgresql" in DATABASE_URL:
+        print("USING POSTGRES DATABASE")
+        engine = create_engine(DATABASE_URL)
+    else:
+        print(f"USING DATABASE: {DATABASE_URL}")
+        engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
 else:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     DATABASE_PATH = os.path.join(BASE_DIR, "crop_diagnosis.db")
