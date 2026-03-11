@@ -100,6 +100,7 @@ jobs:
           mkdir -p web-release
           rm -rf web-release/*
           cp -r frontend/build/web/* web-release/
+          cp frontend/web/vercel.json web-release/ || echo "vercel.json not found"
           git add web-release/
           git commit -m "chore: automated web release after tests pass [skip ci]" || echo "No changes to commit"
           git push origin main
