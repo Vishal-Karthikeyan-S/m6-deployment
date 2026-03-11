@@ -162,6 +162,11 @@ class SyncService {
           try {
             // On Web, we MUST use readBytes or similar to get the data from the Blob URL
             final bytes = await http.readBytes(Uri.parse(submission.mediaPath));
+            
+            if (bytes.isEmpty) {
+              throw Exception('Image data is empty (0 bytes). The browser session likely refreshed. Please tap "Try New Capture" to take a new photo.');
+            }
+            
             request.files.add(http.MultipartFile.fromBytes(
               'file',
               bytes,
