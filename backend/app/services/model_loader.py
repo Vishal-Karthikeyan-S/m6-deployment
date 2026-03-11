@@ -5,7 +5,7 @@ from app.services.labels import CLASS_NAMES
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-num_classes = 29
+num_classes = 15
 
 # 🔥 Load MobileNetV2 (same as training)
 model = models.mobilenet_v2(weights=None)
